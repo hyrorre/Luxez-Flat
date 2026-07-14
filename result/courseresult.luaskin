@@ -1,0 +1,7 @@
+SKINTYPE = 15
+local t = require("resultmain_course")
+if skin_config then
+	return t.main()
+else
+	return t.header
+end
