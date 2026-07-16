@@ -1,3 +1,7 @@
+EGRET.氏により作成された Luxe Flat をベースに、bmz-player 向けの拡張を加えたスキンです。
+
+--- 以下、readme.txt 原文 ---
+
 beatoraja用スキン　Luxe Flat (beta) ver 1.3.0a
 
 last updated: 2024/09/22
@@ -159,4 +163,3 @@ https://pixabay.com/ja/videos/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%90-%E3%82%B9%E3%
 https://pixabay.com/ja/videos/%E8%87%AA%E7%84%B6-%E5%86%AC-%E9%9C%A7-%E9%A2%A8%E6%99%AF-%E5%B1%B1-44752/
 https://pixabay.com/ja/videos/%E3%82%A2%E3%83%AB%E3%83%90%E3%83%BC%E3%83%88-%E3%83%91%E3%83%BC%E3%82%AF-%E3%83%A1%E3%83%AB%E3%83%9C%E3%83%AB%E3%83%B3-53141/
 https://pixabay.com/ja/videos/%E5%9C%B0%E7%90%83-%E6%9C%88-%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9-%E9%8A%80%E6%B2%B3-%E6%98%9F-55990/
-
