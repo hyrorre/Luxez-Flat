@@ -66,11 +66,11 @@ local function load()
 		{id = "default_stateplayoption_bg",				dst = {{x = parts_position.x, y = parts_position.y, w = 1050, h = 65}}},
 		{id = "default_stateplayoption_item_name",		dst = {{x = parts_position.x, y = parts_position.y, w = 1050, h = 65}}},
 		
-		{id = "bmz_select_arrange",		act = 42, dst = {{x = parts_position.x + 37, y = parts_position.y + 10, w = 138, h = 21}}},
-		{id = "bmz_select_gauge",		act = 40, dst = {{x = parts_position.x + 222, y = parts_position.y + 10, w = 96, h = 21}}},
-		{id = "bmz_select_double_option",	act = 54, dst = {{x = parts_position.x + 349, y = parts_position.y + 10, w = 129, h = 21}}},
-		{id = "bmz_select_hs_fix",		act = 55, dst = {{x = parts_position.x + 518, y = parts_position.y + 10, w = 126, h = 21}}},
-		{id = "bmz_select_arrange_2p",		act = 43, dst = {{x = parts_position.x + 689, y = parts_position.y + 10, w = 138, h = 21}}},
+		{id = "bmz_select_arrange",		act = 42, dst = {{x = parts_position.x + 106, y = parts_position.y + 10, w = 138, h = 21}}},
+		{id = "bmz_select_gauge",		act = 40, dst = {{x = parts_position.x + 270, y = parts_position.y + 10, w = 96, h = 21}}},
+		{id = "bmz_select_double_option",	act = 54, dst = {{x = parts_position.x + 414, y = parts_position.y + 10, w = 129, h = 21}}},
+		{id = "bmz_select_hs_fix",		act = 55, dst = {{x = parts_position.x + 581, y = parts_position.y + 10, w = 126, h = 21}}},
+		{id = "bmz_select_arrange_2p",		act = 43, dst = {{x = parts_position.x + 758, y = parts_position.y + 10, w = 138, h = 21}}},
 		{id = "default_stateplayoption_duration",	dst = {{x = parts_position.x + 865, y = parts_position.y + 7, w = 14, h = 25}}},
 		{id = "default_stateplayoption_duration_green",	dst = {{x = parts_position.x + 930, y = parts_position.y + 7, w = 14, h = 25}}},
 	}
