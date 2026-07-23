@@ -143,8 +143,8 @@ local function main()
 		stagefile_gazou_on = 1
 	end
 	if skin_config.option["配置パターンの表示"] == op.PATTERN_ON then 
-		if (((main_state.option(161) or main_state.option(160)) and (main_state.event_index(42) == 2 or main_state.event_index(42) == 3)) or 
-				((main_state.option(163) or main_state.option(162)) and (main_state.event_index(42) == 2 or main_state.event_index(42) == 3 or main_state.event_index(43) == 2 or main_state.event_index(43) == 3))) then
+		if (((main_state.option(161) or main_state.option(160)) and (main_state.event_index(42) == 2 or main_state.event_index(42) == 3 or main_state.event_index(344) == 10 or main_state.event_index(344) == 11)) or
+				((main_state.option(163) or main_state.option(162)) and (main_state.event_index(42) == 2 or main_state.event_index(42) == 3 or main_state.event_index(344) == 10 or main_state.event_index(344) == 11 or main_state.event_index(43) == 2 or main_state.event_index(43) == 3 or main_state.event_index(345) == 10 or main_state.event_index(345) == 11))) then
 					pattern_mode = 1
 		end
 	end
@@ -645,7 +645,11 @@ local function main()
 
 		local lane_option = nil
 		
-		if main_state.event_index(42) == 1 then
+		if main_state.event_index(344) == 10 then
+			lane_option = "F-RANDOM"
+		elseif main_state.event_index(344) == 11 then
+			lane_option = "MF-RANDOM"
+		elseif main_state.event_index(42) == 1 then
 			lane_option = "MIRROR"
 		elseif main_state.event_index(42) == 2 then
 			lane_option = "RANDOM"
@@ -668,7 +672,11 @@ local function main()
 		end
 
 		if main_state.option(163) or main_state.option(162) or main_state.option(1161) then
-			if main_state.event_index(43) == 1 then
+			if main_state.event_index(345) == 10 then
+				lane_option = lane_option .. " / F-RANDOM"
+			elseif main_state.event_index(345) == 11 then
+				lane_option = lane_option .. " / MF-RANDOM"
+			elseif main_state.event_index(43) == 1 then
 				lane_option = lane_option .. " / MIRROR"
 			elseif main_state.event_index(43) == 2 then
 				lane_option = lane_option .. " / RANDOM"

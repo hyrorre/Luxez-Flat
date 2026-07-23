@@ -620,7 +620,11 @@ local function main()
 
 		local lane_option = nil
 		
-		if main_state.event_index(42) == 1 then
+		if main_state.event_index(344) == 10 then
+			lane_option = "F-RANDOM"
+		elseif main_state.event_index(344) == 11 then
+			lane_option = "MF-RANDOM"
+		elseif main_state.event_index(42) == 1 then
 			lane_option = "MIRROR"
 		elseif main_state.event_index(42) == 2 then
 			lane_option = "RANDOM"
@@ -643,7 +647,11 @@ local function main()
 		end
 
 		if main_state.option(163) or main_state.option(162) or main_state.option(1161) then
-			if main_state.event_index(43) == 1 then
+			if main_state.event_index(345) == 10 then
+				lane_option = lane_option .. " / F-RANDOM"
+			elseif main_state.event_index(345) == 11 then
+				lane_option = lane_option .. " / MF-RANDOM"
+			elseif main_state.event_index(43) == 1 then
 				lane_option = lane_option .. " / MIRROR"
 			elseif main_state.event_index(43) == 2 then
 				lane_option = lane_option .. " / RANDOM"
