@@ -47,51 +47,30 @@ local function load()
 		{id = "default_stateplayoption_speed_5",	src = src1_id, x = 400, y = 100, w = 126, h = 21},
 	}
 
-	parts.imageset = {
-		{id = "default_stateplayoption_option_random", ref = 42, images = {
-			"default_stateplayoption_random_1","default_stateplayoption_random_2",
-			"default_stateplayoption_random_3","default_stateplayoption_random_4",
-			"default_stateplayoption_random_5","default_stateplayoption_random_6",
-			"default_stateplayoption_random_7","default_stateplayoption_random_8",
-			"default_stateplayoption_random_9","default_stateplayoption_random_10"
-		}, act = 42},
-		{id = "default_stateplayoption_option_gauge", ref = 40, images = {
-			"default_stateplayoption_gauge_1","default_stateplayoption_gauge_2",
-			"default_stateplayoption_gauge_3","default_stateplayoption_gauge_4",
-			"default_stateplayoption_gauge_5","default_stateplayoption_gauge_6"
-		}, act = 40},
-		{id = "default_stateplayoption_option_dp", ref = 54, images = {
-			"default_stateplayoption_dp_1","default_stateplayoption_dp_2",
-			"default_stateplayoption_dp_3","default_stateplayoption_dp_4"
-		}, act = 54},
-		{id = "default_stateplayoption_option_hsfix", ref = 55, images = {
-			"default_stateplayoption_speed_1","default_stateplayoption_speed_2",
-			"default_stateplayoption_speed_3","default_stateplayoption_speed_4",
-			"default_stateplayoption_speed_5"
-		}, act = 55},
-		{id = "default_stateplayoption_option_random2", ref = 43, images = {
-			"default_stateplayoption_random_1","default_stateplayoption_random_2",
-			"default_stateplayoption_random_3","default_stateplayoption_random_4",
-			"default_stateplayoption_random_5","default_stateplayoption_random_6",
-			"default_stateplayoption_random_7","default_stateplayoption_random_8",
-			"default_stateplayoption_random_9","default_stateplayoption_random_10"
-		}, act = 43}
-	}
+	parts.imageset = {}
 
 	parts.value = {
 		{id = "default_stateplayoption_duration",		src = "number_alte", x = 0, y = 0, w = 140, h = 25, divx = 10, digit = 4, ref = 312},
 		{id = "default_stateplayoption_duration_green",	src = "number_alte", x = 0, y = 25, w = 140, h = 25, divx = 10, digit = 4, ref = 313},
+	}
+
+	parts.text = {
+		{id = "bmz_select_arrange", font = "font_sub_small", size = 18, align = 1, overflow = 1},
+		{id = "bmz_select_gauge", font = "font_sub_small", size = 18, align = 1, overflow = 1},
+		{id = "bmz_select_double_option", font = "font_sub_small", size = 18, align = 1, overflow = 1},
+		{id = "bmz_select_hs_fix", font = "font_sub_small", size = 18, align = 1, overflow = 1},
+		{id = "bmz_select_arrange_2p", font = "font_sub_small", size = 18, align = 1, overflow = 1}
 	}
 	
 	parts.destination = {
 		{id = "default_stateplayoption_bg",				dst = {{x = parts_position.x, y = parts_position.y, w = 1050, h = 65}}},
 		{id = "default_stateplayoption_item_name",		dst = {{x = parts_position.x, y = parts_position.y, w = 1050, h = 65}}},
 		
-		{id = "default_stateplayoption_option_random",	dst = {{x = parts_position.x + 37, y = parts_position.y + 10, w = 138, h = 21}}},
-		{id = "default_stateplayoption_option_gauge",	dst = {{x = parts_position.x + 222, y = parts_position.y + 10, w = 96, h = 21}}},
-		{id = "default_stateplayoption_option_dp",		dst = {{x = parts_position.x + 349, y = parts_position.y + 10, w = 129, h = 21}}},			
-		{id = "default_stateplayoption_option_hsfix",	dst = {{x = parts_position.x + 518, y = parts_position.y + 10, w = 126, h = 21}}},
-		{id = "default_stateplayoption_option_random2",	dst = {{x = parts_position.x + 689, y = parts_position.y + 10, w = 138, h = 21}}},
+		{id = "bmz_select_arrange",		act = 42, dst = {{x = parts_position.x + 37, y = parts_position.y + 10, w = 138, h = 21}}},
+		{id = "bmz_select_gauge",		act = 40, dst = {{x = parts_position.x + 222, y = parts_position.y + 10, w = 96, h = 21}}},
+		{id = "bmz_select_double_option",	act = 54, dst = {{x = parts_position.x + 349, y = parts_position.y + 10, w = 129, h = 21}}},
+		{id = "bmz_select_hs_fix",		act = 55, dst = {{x = parts_position.x + 518, y = parts_position.y + 10, w = 126, h = 21}}},
+		{id = "bmz_select_arrange_2p",		act = 43, dst = {{x = parts_position.x + 689, y = parts_position.y + 10, w = 138, h = 21}}},
 		{id = "default_stateplayoption_duration",	dst = {{x = parts_position.x + 865, y = parts_position.y + 7, w = 14, h = 25}}},
 		{id = "default_stateplayoption_duration_green",	dst = {{x = parts_position.x + 930, y = parts_position.y + 7, w = 14, h = 25}}},
 	}
