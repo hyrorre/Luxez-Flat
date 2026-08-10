@@ -3,11 +3,13 @@ local parts = {}
 local function load()
 	
 	local src1_id = "src-default-stateplayoption-parts"
+	local random_bmz_src_id = "src-default-stateplayoption-random-bmz"
 	local parts_position = {x = 32, y = 0}
 	--local parts_position = {x = 435, y = 0}
 	
 	parts.source = {
 		{id = src1_id, path = "select_skinparts/default_stateplayoption/stateoption_resize.png"},
+		{id = random_bmz_src_id, path = "select_skinparts/default_stateplayoption/random_bmz.png"},
 	}
 
 	parts.image = {
@@ -24,6 +26,8 @@ local function load()
 		{id = "default_stateplayoption_random_8",	src = src1_id, x = 0, y = 175, w = 138, h = 21},
 		{id = "default_stateplayoption_random_9",	src = src1_id, x = 0, y = 200, w = 138, h = 21},
 		{id = "default_stateplayoption_random_10",	src = src1_id, x = 0, y = 225, w = 138, h = 21},
+		{id = "default_stateplayoption_random_11",	src = random_bmz_src_id, x = 0, y = 0, w = 138, h = 21},
+		{id = "default_stateplayoption_random_12",	src = random_bmz_src_id, x = 0, y = 21, w = 138, h = 21},
 		
 		-- gauge
 		{id = "default_stateplayoption_gauge_1",	src = src1_id, x = 150, y = 0, w = 96, h = 21},
@@ -47,7 +51,36 @@ local function load()
 		{id = "default_stateplayoption_speed_5",	src = src1_id, x = 400, y = 100, w = 126, h = 21},
 	}
 
-	parts.imageset = {}
+	parts.imageset = {
+		{id = "default_stateplayoption_random", ref = 344, images = {
+			"default_stateplayoption_random_1",
+			"default_stateplayoption_random_2",
+			"default_stateplayoption_random_3",
+			"default_stateplayoption_random_4",
+			"default_stateplayoption_random_5",
+			"default_stateplayoption_random_6",
+			"default_stateplayoption_random_7",
+			"default_stateplayoption_random_8",
+			"default_stateplayoption_random_9",
+			"default_stateplayoption_random_10",
+			"default_stateplayoption_random_11",
+			"default_stateplayoption_random_12",
+		}},
+		{id = "default_stateplayoption_random_2p", ref = 345, images = {
+			"default_stateplayoption_random_1",
+			"default_stateplayoption_random_2",
+			"default_stateplayoption_random_3",
+			"default_stateplayoption_random_4",
+			"default_stateplayoption_random_5",
+			"default_stateplayoption_random_6",
+			"default_stateplayoption_random_7",
+			"default_stateplayoption_random_8",
+			"default_stateplayoption_random_9",
+			"default_stateplayoption_random_10",
+			"default_stateplayoption_random_11",
+			"default_stateplayoption_random_12",
+		}},
+	}
 
 	parts.value = {
 		{id = "default_stateplayoption_duration",		src = "number_alte", x = 0, y = 0, w = 140, h = 25, divx = 10, digit = 4, ref = 312},
@@ -55,11 +88,9 @@ local function load()
 	}
 
 	parts.text = {
-		{id = "bmz_select_arrange", font = "font_sub_small", size = 18, align = 1, overflow = 1},
 		{id = "bmz_select_gauge", font = "font_sub_small", size = 18, align = 1, overflow = 1},
 		{id = "bmz_select_double_option", font = "font_sub_small", size = 18, align = 1, overflow = 1},
-		{id = "bmz_select_hs_fix", font = "font_sub_small", size = 18, align = 1, overflow = 1},
-		{id = "bmz_select_arrange_2p", font = "font_sub_small", size = 18, align = 1, overflow = 1}
+		{id = "bmz_select_hs_fix", font = "font_sub_small", size = 18, align = 1, overflow = 1}
 	}
 
 	parts.panel = {
@@ -71,17 +102,21 @@ local function load()
 		{id = "default_stateplayoption_item_name",		dst = {{x = parts_position.x, y = parts_position.y, w = 1050, h = 65}}},
 		{id = "default_stateplayoption_duration",	dst = {{x = parts_position.x + 865, y = parts_position.y + 7, w = 14, h = 25}}},
 		{id = "default_stateplayoption_duration_green",	dst = {{x = parts_position.x + 930, y = parts_position.y + 7, w = 14, h = 25}}},
+		{id = "default_stateplayoption_random",	dst = {{x = parts_position.x + 37, y = parts_position.y + 10, w = 138, h = 21}}},
+		{id = "default_stateplayoption_random_2p",	dst = {{x = parts_position.x + 689, y = parts_position.y + 10, w = 138, h = 21}}},
 	}
 
 	local function append_option(id, act, x, w)
-		table.insert(parts.destination, {id = id, dst = {{x = x + math.floor(w / 2 + 0.5), y = parts_position.y + 10, w = w, h = 21}}})
+		if id then
+			table.insert(parts.destination, {id = id, dst = {{x = x + math.floor(w / 2 + 0.5), y = parts_position.y + 10, w = w, h = 21}}})
+		end
 		table.insert(parts.destination, {id = "bmz_select_option_hit", act = act, dst = {{x = x, y = parts_position.y + 10, w = w, h = 21}}})
 	end
-	append_option("bmz_select_arrange", 42, parts_position.x + 37, 138)
+	append_option(nil, 42, parts_position.x + 37, 138)
 	append_option("bmz_select_gauge", 40, parts_position.x + 222, 96)
 	append_option("bmz_select_double_option", 54, parts_position.x + 349, 129)
 	append_option("bmz_select_hs_fix", 55, parts_position.x + 518, 126)
-	append_option("bmz_select_arrange_2p", 43, parts_position.x + 689, 138)
+	append_option(nil, 43, parts_position.x + 689, 138)
 
 	return parts
 end
