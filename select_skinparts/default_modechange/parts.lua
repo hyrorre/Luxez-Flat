@@ -57,7 +57,12 @@ local function load()
 
 	}
 	
+	parts.text = {
+		{id = "bmz_ln_force_badge", font = "font_VL-Gothic-Regular", size = 14, align = 1, constantText = "FORCE"}
+	}
+
 	parts.destination = {
+		{id = "bmz_ln_force_badge", op = {19168}, clickable = false, dst = {{x = 1208, y = 1041, w = 115, h = 14, r = 255, g = 170, b = 64}}},
 		{id = "default_modechange_modeset",		dst = {{x = 977, y = 1034, w = 135, h = 35}}},
 		{id = "default_modechange_sortset",		dst = {{x = 977, y = 990, w = 135, h = 35}}},
 		{id = "default_modechange_lnmodeset",	dst = {{x = 1151, y = 1004, w = 115, h = 35}}},
