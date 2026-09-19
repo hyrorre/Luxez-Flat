@@ -58,7 +58,7 @@ local function load()
 	}
 	
 	parts.text = {
-		{id = "bmz_ln_force_badge", font = "font_VL-Gothic-Regular", size = 14, align = 2, constantText = "FORCE"}
+		{id = "bmz_ln_force_badge", font = "font_VL-Gothic-Regular", size = 12, align = 2, constantText = "FORCE"}
 	}
 
 	parts.destination = {
@@ -99,7 +99,7 @@ local function load()
 		{id = "time_hour",	dst = {{x = 1779, y = 1030, w = 17, h = 25}}},
 		{id = "time_minute",	dst = {{x = 1823, y = 1030, w = 17, h = 25}}},
 		{id = "time_second",	dst = {{x = 1867, y = 1030, w = 17, h = 25}}},
-		{id = "bmz_ln_force_badge", op = {19168}, clickable = false, dst = {{x = 1260, y = 1022, w = 60, h = 14, r = 255, g = 255, b = 255}}},
+		{id = "bmz_ln_force_badge", op = {19168}, clickable = false, dst = {{x = 1248, y = 1024, w = 60, h = 12, r = 255, g = 255, b = 255}}},
 		
 
 
