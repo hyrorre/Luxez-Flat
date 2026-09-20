@@ -5,14 +5,6 @@ local function load()
 	parts.source = {{id = "src-default_modechange_parts", path = "select_skinparts/default_modechange/sort_resize.png"}}
 
 	parts.image = {
-		{id = "default_modechange_allkeys",		src = "src-default_modechange_parts", x = 0, y = 0, w = 135, h = 35},
-		{id = "default_modechange_5keys",		src = "src-default_modechange_parts", x = 0, y = 35, w = 135, h = 35},
-		{id = "default_modechange_7keys",		src = "src-default_modechange_parts", x = 0, y = 70, w = 135, h = 35},
-		{id = "default_modechange_10keys",		src = "src-default_modechange_parts", x = 0, y = 105, w = 135, h = 35},
-		{id = "default_modechange_14keys",		src = "src-default_modechange_parts", x = 0, y = 140, w = 135, h = 35},
-		{id = "default_modechange_9keys",		src = "src-default_modechange_parts", x = 0, y = 175, w = 135, h = 35},
-		{id = "default_modechange_24keys",		src = "src-default_modechange_parts", x = 0, y = 210, w = 135, h = 35},
-		{id = "default_modechange_24keysDP",	src = "src-default_modechange_parts", x = 0, y = 245, w = 135, h = 35},
 		{id = "default_modechange_sortset",		src = "src-default_modechange_parts", x = 135, y = 0, w = 135, h = 280, divy = 8, len = 8, ref = 12, act = 12, click = 2},
 		{id = "default_modechange_lnmodeset",	src = "src-default_modechange_parts", x = 270, y = 0, w = 115, h = 105, divy = 3, len = 3, ref = 308, act = 308, click = 2},
 		{id = "default_modechange_rect",		src = "src-default_modechange_parts", x = 0, y = 280, w = 135, h = 35},
@@ -28,19 +20,6 @@ local function load()
 
 	}
 
-	parts.imageset = {
-		{id = "default_modechange_modeset", ref = 11, images = {
-		"default_modechange_allkeys",
-		"default_modechange_5keys",
-		"default_modechange_7keys",
-		"default_modechange_10keys",
-		"default_modechange_14keys",
-		"default_modechange_9keys",
-		"default_modechange_24keys",
-		"default_modechange_24keysDP"},
-		act = 11, click = 2
-		}
-	}
 
 	parts.value = {
 		{id = "total_notes",		src = "number_alte", x = 0, y = 50, w = 110, h = 25, divx = 10, digit = 10, ref = 333, align = 0},
@@ -58,15 +37,16 @@ local function load()
 	}
 	
 	parts.text = {
+		{id = "bmz_select_mode", font = "font_VL-Gothic-Regular", size = 25, align = 1, overflow = 1},
 		{id = "bmz_ln_force_badge", font = "font_VL-Gothic-Regular", size = 12, align = 2, constantText = "FORCE"}
 	}
 
 	parts.destination = {
-		{id = "default_modechange_modeset",		dst = {{x = 977, y = 1034, w = 135, h = 35}}},
+		{id = "bmz_select_mode", dst = {{x = 1044, y = 1039, w = 135, h = 25}}},
 		{id = "default_modechange_sortset",		dst = {{x = 977, y = 990, w = 135, h = 35}}},
 		{id = "default_modechange_lnmodeset",	dst = {{x = 1151, y = 1004, w = 115, h = 35}}},
 		
-		{id = "default_modechange_rect",		dst = {{x = 977, y = 1034, w = 135, h = 35}}, mouseRect = {x = 0, y = 0, w = 135, h = 35}},
+		{id = "default_modechange_rect",	act = 11, click = 2, dst = {{x = 977, y = 1034, w = 135, h = 35}}, mouseRect = {x = 0, y = 0, w = 135, h = 35}},
 		{id = "default_modechange_rect_left",		dst = {{x = 977, y = 1034, w = 67, h = 35}}, mouseRect = {x = 0, y = 0, w = 67, h = 35}}, --36idou
 		{id = "default_modechange_rect_right",		dst = {{x = 1044, y = 1034, w = 68, h = 35}}, mouseRect = {x = 0, y = 0, w = 68, h = 35}},
 		
