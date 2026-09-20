@@ -2,9 +2,13 @@ local parts = {}
 
 local function load()
 	
-	parts.source = {{id = "src-default_modechange_parts", path = "select_skinparts/default_modechange/sort_resize.png"}}
+	parts.source = {
+		{id = "src-default_modechange_parts", path = "select_skinparts/default_modechange/sort_resize.png"},
+		{id = "src-default_modechange_frame", path = "select_skinparts/default_modechange/modechange_frame.png"}
+	}
 
 	parts.image = {
+		{id = "default_modechange_frame", src = "src-default_modechange_frame", x = 0, y = 0, w = 135, h = 35},
 		{id = "default_modechange_sortset",		src = "src-default_modechange_parts", x = 135, y = 0, w = 135, h = 280, divy = 8, len = 8, ref = 12, act = 12, click = 2},
 		{id = "default_modechange_lnmodeset",	src = "src-default_modechange_parts", x = 270, y = 0, w = 115, h = 105, divy = 3, len = 3, ref = 308, act = 308, click = 2},
 		{id = "default_modechange_rect",		src = "src-default_modechange_parts", x = 0, y = 280, w = 135, h = 35},
@@ -42,6 +46,7 @@ local function load()
 	}
 
 	parts.destination = {
+		{id = "default_modechange_frame", dst = {{x = 977, y = 1034, w = 135, h = 35}}},
 		{id = "bmz_select_mode", dst = {{x = 1044, y = 1039, w = 135, h = 25}}},
 		{id = "default_modechange_sortset",		dst = {{x = 977, y = 990, w = 135, h = 35}}},
 		{id = "default_modechange_lnmodeset",	dst = {{x = 1151, y = 1004, w = 115, h = 35}}},
