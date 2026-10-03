@@ -17,4 +17,5 @@ default_favorite/parts.lua
 default_mascot/parts.lua
 default_modebotton/parts.lua
 default_optionpanel/parts.lua
+default_detailoptions/parts.lua
 default_shutter/parts.lua

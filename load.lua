@@ -111,6 +111,10 @@ function load_parts()
 			if skin_config then
 				local parts_status, parts = pcall(function() return dofile(path).load() end)
 				if parts_status and parts then
+					if parts.bmzDetailOptions == 1 then
+						skin.bmzDetailOptions = 1
+						skin.bmzDetailOptionsClose = parts.bmzDetailOptionsClose == true
+					end
 					append_all(skin.property, parts.property)
 					append_all(skin.filepath, parts.filepath)
 					append_all(skin.offset, parts.offset)
@@ -164,6 +168,16 @@ function load_parts()
 		load_log:close()
 	end
 		
+	-- Replace only this skin's legacy E2 destinations after successful loading.
+	if skin.bmzDetailOptions == 1 then
+		local destinations = {}
+		for _, destination in ipairs(skin.destination) do
+			if not destination.bmzLegacyAssist then
+				table.insert(destinations, destination)
+			end
+		end
+		skin.destination = destinations
+	end
 	return skin
 end
 

@@ -353,6 +353,16 @@ local function load()
 		table.insert(parts.destination, {id = "default_optionpanel_target_" .. i, draw = function() return (main_state.option(21) and main_state.text(200+i-1):sub(1,9) == "NEXT RANK") end, loop = 300, timer = 21, dst = {{time = 300, x = 276 + 10, y = 801 - 31 - ((37 - 2) * (i - 1)), w = 190, h = 18, a = 255, r = 255, g = 153, b = 173}}})
 	end
 	
+	-- E2 also has timerless mouseRect overlays. Keep the same image definitions
+	-- for E1+E2, but mark every E2 destination for optional replacement in load.lua.
+	for _, destination in ipairs(parts.destination) do
+		if destination.timer == 22 or destination.timer == 32 then
+			destination.bmzLegacyAssist = true
+		end
+		for _, option in ipairs(destination.op or {}) do
+			if option == 22 or option == -22 then destination.bmzLegacyAssist = true end
+		end
+	end
 	return parts	
 end
 
