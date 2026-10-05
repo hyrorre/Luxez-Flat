@@ -1,10 +1,11 @@
 -- BMZ DETAIL OPTIONS v1. The player owns settings, input and translations.
 local function load()
-	if not bmz then return nil end
+	if not bmz or bmz.get_option("bmz_detail_options", "0") ~= "1" then return nil end
 	local prefix = "luxe_detail_"
 	local pitch, left, width = 274, 9, 258
 	local parts = {
 		bmzDetailOptions = 1,
+		bmzDetailOptionsNumbers = true,
 		bmzDetailOptionsClose = true,
 		source = {
 			{id = prefix .. "panel", path = "select_skinparts/default_optionpanel/option2_panel_ver1.3.0.png"},
@@ -171,6 +172,20 @@ local function load()
 			draw(name, x + width / 2, y + 4, 210, 38, {cell, row + 3}, slot)
 			draw(name, x + width / 2, y + 4, 210, 38, {cell, -(row + 3)}, slot, {172, 172, 172})
 			draw(name .. "_hit", x + 10, y, 238, 50, {cell + 2}, slot)
+		end
+		text(id .. "_number", row + 1, 26, 1, "choices")
+		button(x + 16, 274, 226 / 176, row + 5, slot)
+		draw("value_selected", x + 16 - 19 * 226 / 176, 274 - 19 * 226 / 176,
+			213 * 226 / 176, 76 * 226 / 176, {row + 5}, slot)
+		draw(id .. "_number", x + width / 2, 278, 210, 38, {row + 5}, slot)
+		for direction = 0, 1 do
+			local name, bx = id .. "_number_" .. direction, x + 16 + direction * 122
+			hit(name .. "_hit", 19320 + slot * 2 + direction)
+			table.insert(parts.text, {id = prefix .. name, font = prefix .. "choices",
+				constantText = direction == 0 and "−" or "+", size = 26, align = 1})
+			button(bx, 342, 104 / 176, row + 5, slot)
+			draw(name, bx + 52, 336, 90, 38, {row + 5}, slot)
+			draw(name .. "_hit", bx, 336, 104, 38, {row + 6 + direction}, slot)
 		end
 	end
 	draw("footer", 9, 746, 1902, 178)
