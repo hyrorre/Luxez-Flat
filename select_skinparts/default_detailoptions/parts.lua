@@ -178,15 +178,6 @@ local function load()
 		draw("value_selected", x + 16 - 19 * 226 / 176, 274 - 19 * 226 / 176,
 			213 * 226 / 176, 76 * 226 / 176, {row + 5}, slot)
 		draw(id .. "_number", x + width / 2, 278, 210, 38, {row + 5}, slot)
-		for direction = 0, 1 do
-			local name, bx = id .. "_number_" .. direction, x + 16 + direction * 122
-			hit(name .. "_hit", 19320 + slot * 2 + direction)
-			table.insert(parts.text, {id = prefix .. name, font = prefix .. "choices",
-				constantText = direction == 0 and "−" or "+", size = 26, align = 1})
-			button(bx, 342, 104 / 176, row + 5, slot)
-			draw(name, bx + 52, 336, 90, 38, {row + 5}, slot)
-			draw(name .. "_hit", bx, 336, 104, 38, {row + 6 + direction}, slot)
-		end
 	end
 	draw("footer", 9, 746, 1902, 178)
 	text("category", 19302, 26)
