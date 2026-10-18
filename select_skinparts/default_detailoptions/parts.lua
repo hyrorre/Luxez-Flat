@@ -9,6 +9,8 @@ local function load()
 		bmzDetailOptionsClose = true,
 		source = {
 			{id = prefix .. "panel", path = "select_skinparts/default_optionpanel/option2_panel_ver1.3.0.png"},
+			{id = prefix .. "panel1", path = "select_skinparts/default_optionpanel/option1_panel_bmz.png"},
+			{id = prefix .. "panel3", path = "select_skinparts/default_optionpanel/option3_panel_ver1.3.0.png"},
 			{id = prefix .. "cursor", path = "select_skinparts/default_optionpanel/cursor_ver1.3.0.png"},
 		},
 		font = {
@@ -16,7 +18,7 @@ local function load()
 			{id = prefix .. "small", path = "select_skinparts/default_commonparts/font_ver1.2.0/font_sub_small/sub_small.fnt"},
 			{id = prefix .. "choices", path = "select_skinparts/default_detailoptions/font/NotoSansCJKjp-Medium.otf"},
 		},
-		panel = {}, image = {}, text = {}, destination = {},
+		panel = {}, image = {}, imageset = {}, text = {}, destination = {},
 	}
 	local function panel(id, color)
 		table.insert(parts.panel, {id = prefix .. id, color = color})
@@ -59,10 +61,32 @@ local function load()
 	end
 	panel("shade", "000000B4")
 	panel("column", "10091B70")
-	panel("selected", "34065780")
-	panel("header", "35085CA0")
 	panel("footer", "10091B90")
 	panel("black", "000000FF")
+	-- Column colours follow each row's category. These option cards share the
+	-- purple card's rounded corners pixel for pixel; each entry is
+	-- {source, left, top, right, bottom} of the opaque card (right / bottom exclusive).
+	local cards = {
+		blue = {"panel3", 483, 712, 690, 957}, -- BGA
+		green = {"panel1", 749, 334, 956, 702}, -- groove gauge
+		orange = {"panel3", 414, 133, 671, 460}, -- GAS
+		red = {"panel3", 713, 713, 920, 917}, -- auto adjust
+		purple = {"panel", 607, 172, 814, 355}, -- assist
+	}
+	-- Index = category_id: 1 LANE / HI-SPEED, 2 GAUGE, 4 LONG NOTE,
+	-- 5 ASSIST / MODIFIER, 6 BGA, 7 JUDGE (0 and the retired 3 stay blue).
+	local category_colors = {"blue", "blue", "green", "blue", "orange", "purple", "red", "blue"}
+	local category_parts = {}
+	-- Slice the same part from every card and register an imageset per column
+	-- that picks the colour from that row's category_id, so the columns need no
+	-- extra destinations or draw conditions.
+	local function card_sprite(id, slice)
+		for name, card in pairs(cards) do
+			local x, y, w, h = slice(card[2], card[3], card[4], card[5])
+			sprite(id .. "_" .. name, card[1], x, y, w, h)
+		end
+		table.insert(category_parts, id)
+	end
 	-- Crop only the rounded rim, not the opaque fill baked into the 24 px corners.
 	-- Each span is {height, outer inset, inner inset}; coordinates match the old
 	-- purple card. Keep its antialiased pixels and bevel, without editing the PNG.
@@ -75,23 +99,37 @@ local function load()
 	}
 	local corners, fill_bands, dy = {}, {}, 0
 	for index, span in ipairs(rim) do
-		local h, outer, inner = span[1], span[2], span[3]
+		local h, outer, inner, offset = span[1], span[2], span[3], dy
 		for corner = 0, 3 do
 			local right, bottom = corner % 2 == 1, corner >= 2
-			local sx = right and 814 - inner or 607 + outer
-			local sy = bottom and 354 - dy - h or 173 + dy
 			local id = "corner_" .. corner .. "_" .. index
-			sprite(id, "panel", sx, sy, inner - outer, h)
+			card_sprite(id, function(l, t, r, b)
+				return right and r - inner or l + outer,
+					bottom and b - 1 - offset - h or t + 1 + offset, inner - outer, h
+			end)
 			table.insert(corners, {id, right and width - inner or outer,
 				bottom and 550 - dy - h or dy, inner - outer, h})
 		end
 		if dy >= 7 then table.insert(fill_bands, {dy, h, inner}) end
 		dy = dy + h
 	end
-	sprite("top", "panel", 631, 173, 159, 7)
-	sprite("bottom", "panel", 631, 347, 159, 7)
-	sprite("left", "panel", 607, 197, 7, 133)
-	sprite("right", "panel", 807, 197, 7, 133)
+	card_sprite("top", function(l, t) return l + 24, t + 1, 159, 7 end)
+	card_sprite("bottom", function(l, _, _, b) return l + 24, b - 8, 159, 7 end)
+	card_sprite("left", function(l, t) return l, t + 25, 7, 133 end)
+	card_sprite("right", function(_, t, r) return r - 7, t + 25, 7, 133 end)
+	-- A plain pixel of the inner bevel tints the header and selected fills; the
+	-- purple one is within a few levels of the former 35085C / 340657 panels.
+	card_sprite("tint", function(l, t) return l + 7, t + 100, 1, 1 end)
+	for slot = 0, 8 do
+		for _, part in ipairs(category_parts) do
+			local images = {}
+			for _, name in ipairs(category_colors) do
+				table.insert(images, prefix .. part .. "_" .. name)
+			end
+			table.insert(parts.imageset, {id = prefix .. part .. "_" .. slot,
+				value = 19401 + slot * 10, images = images})
+		end
+	end
 	-- The old 176x39 crop includes purple outside the rounded 175x38 button.
 	-- These disjoint bands retain only the neutral button pixels, not its matte.
 	local button_bands, button_y = {}, 0
@@ -114,21 +152,25 @@ local function load()
 		dst = {{time = 0, x = 0, y = 0, w = 1920, h = 1080, a = 255}, {time = 300, a = 0}}})
 	local function border(x, options, slot, alpha)
 		for _, piece in ipairs(corners) do
-			draw(piece[1], x + piece[2], 180 + piece[3], piece[4], piece[5], options, slot, nil, alpha)
+			draw(piece[1] .. "_" .. slot, x + piece[2], 180 + piece[3], piece[4], piece[5],
+				options, slot, nil, alpha)
 		end
 		for _, piece in ipairs({
 			{"top", x + 24, 180, width - 48, 7}, {"bottom", x + 24, 723, width - 48, 7},
 			{"left", x, 204, 7, 502}, {"right", x + width - 7, 204, 7, 502},
 		}) do
-			draw(piece[1], piece[2], piece[3], piece[4], piece[5], options, slot, nil, alpha)
+			draw(piece[1] .. "_" .. slot, piece[2], piece[3], piece[4], piece[5],
+				options, slot, nil, alpha)
 		end
 	end
-	local function fill(id, x, row, slot, header)
-		draw(id, x + 7, 204, width - 14, header and 46 or 502, {row}, slot)
+	local function fill(id, x, row, slot, header, alpha)
+		draw(id, x + 7, 204, width - 14, header and 46 or 502, {row}, slot, nil, alpha)
 		for _, band in ipairs(fill_bands) do
 			local y, h, inset = band[1], band[2], band[3]
-			draw(id, x + inset, 180 + y, width - inset * 2, h, {row}, slot)
-			if not header then draw(id, x + inset, 730 - y - h, width - inset * 2, h, {row}, slot) end
+			draw(id, x + inset, 180 + y, width - inset * 2, h, {row}, slot, nil, alpha)
+			if not header then
+				draw(id, x + inset, 730 - y - h, width - inset * 2, h, {row}, slot, nil, alpha)
+			end
 		end
 	end
 	local function button(x, y, scale, cell, slot)
@@ -151,8 +193,8 @@ local function load()
 		text(id .. "_external", row + 1, 26, 1, "choices")
 		draw(id .. "_hit", x, 180, width, 550, {row}, slot)
 		fill("column", x, row, slot)
-		fill("selected", x, row + 1, slot)
-		fill("header", x, row, slot, true)
+		fill("tint_" .. slot, x, row + 1, slot, false, 128)
+		fill("tint_" .. slot, x, row, slot, true, 160)
 		border(x, {row, -(row + 1)}, slot, 100)
 		border(x, {row + 1}, slot, 255)
 		draw(id .. "_label", x + width / 2, 208, width - 24, 36, {row}, slot)
