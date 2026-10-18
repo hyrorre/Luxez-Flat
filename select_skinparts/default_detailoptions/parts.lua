@@ -36,7 +36,7 @@ local function load()
 	end
 	-- Coordinates below use a top-left origin. Match the original 300 ms opening
 	-- and closing easing; moving hit areas exist only while E2 is active.
-	local function draw(id, x, y, w, h, options, slot, color, alpha)
+	local function draw(id, x, y, w, h, options, slot, color, alpha, when)
 		local op = {19300, 22}
 		for _, value in ipairs(options or {}) do table.insert(op, value) end
 		local frame = {time = 0, x = x - 1920, y = 1080 - y - h, w = w, h = h, acc = 2, a = alpha or 255}
@@ -47,7 +47,7 @@ local function load()
 			frames = {frame}
 		end
 		table.insert(parts.destination, {id = prefix .. id, op = op, timer = 22, loop = 300, dst = frames,
-			bmzDetailScroll = slot and {pitch, 0} or nil})
+			draw = when, bmzDetailScroll = slot and {pitch, 0} or nil})
 		-- Freeze only the seven visible columns on exit. Neither overscan nor hits
 		-- should slide back into view, including transitions to the other panels.
 		if not id:match("_hit$") and (not slot or slot < 7) then
@@ -56,22 +56,23 @@ local function load()
 			local close = {time = 0, x = x, y = 1080 - y - h, w = w, h = h, acc = 2, a = alpha or 255}
 			if color then close.r, close.g, close.b = color[1], color[2], color[3] end
 			table.insert(parts.destination, {id = prefix .. id, op = close_op, timer = 32, loop = -1,
-				dst = {close, {time = 300, x = x - 1920}}, bmzDetailScroll = slot and {pitch, 0} or nil})
+				dst = {close, {time = 300, x = x - 1920}}, draw = when, bmzDetailScroll = slot and {pitch, 0} or nil})
 		end
 	end
 	panel("shade", "000000B4")
-	panel("column", "10091B70")
 	panel("footer", "10091B90")
 	panel("black", "000000FF")
 	-- Column colours follow each row's category. These option cards share the
 	-- purple card's rounded corners pixel for pixel; each entry is
-	-- {source, left, top, right, bottom} of the opaque card (right / bottom exclusive).
+	-- {source, left, top, right, bottom} of the opaque card (right / bottom exclusive)
+	-- the light rim colour the normal cards use for their bottom caption, and the
+	-- top of the card's first button (always 16 px inside both sides).
 	local cards = {
-		blue = {"panel3", 483, 712, 690, 957}, -- BGA
-		green = {"panel1", 749, 334, 956, 702}, -- groove gauge
-		orange = {"panel3", 414, 133, 671, 460}, -- GAS
-		red = {"panel3", 713, 713, 920, 917}, -- auto adjust
-		purple = {"panel", 607, 172, 814, 355}, -- assist
+		blue = {"panel3", 483, 712, 690, 957, {76, 242, 254}, 85}, -- BGA
+		green = {"panel1", 749, 334, 956, 702, {76, 254, 97}, 85}, -- groove gauge
+		orange = {"panel3", 414, 133, 671, 460, {254, 177, 76}, 85}, -- GAS
+		red = {"panel3", 713, 713, 920, 917, {254, 75, 75}, 85}, -- auto adjust
+		purple = {"panel", 607, 172, 814, 355, {176, 75, 254}, 105}, -- assist
 	}
 	-- Index = category_id: 1 LANE / HI-SPEED, 2 GAUGE, 4 LONG NOTE,
 	-- 5 ASSIST / MODIFIER, 6 BGA, 7 JUDGE (0 and the retired 3 stay blue).
@@ -82,7 +83,7 @@ local function load()
 	-- extra destinations or draw conditions.
 	local function card_sprite(id, slice)
 		for name, card in pairs(cards) do
-			local x, y, w, h = slice(card[2], card[3], card[4], card[5])
+			local x, y, w, h = slice(card[2], card[3], card[4], card[5], card)
 			sprite(id .. "_" .. name, card[1], x, y, w, h)
 		end
 		table.insert(category_parts, id)
@@ -110,16 +111,33 @@ local function load()
 			table.insert(corners, {id, right and width - inner or outer,
 				bottom and 550 - dy - h or dy, inner - outer, h})
 		end
-		if dy >= 7 then table.insert(fill_bands, {dy, h, inner}) end
+		if dy >= 7 then
+			-- The opaque fill copies the card itself: each rounded top row takes the
+			-- header gradient at the same height, from a column clear of the title.
+			local band = "grad_row_" .. index
+			card_sprite(band, function(l, t) return l + 22, t + 1 + offset, 1, h end)
+			table.insert(fill_bands, {dy, h, inner, band})
+		end
 		dy = dy + h
 	end
 	card_sprite("top", function(l, t) return l + 24, t + 1, 159, 7 end)
 	card_sprite("bottom", function(l, _, _, b) return l + 24, b - 8, 159, 7 end)
 	card_sprite("left", function(l, t) return l, t + 25, 7, 133 end)
 	card_sprite("right", function(_, t, r) return r - 7, t + 25, 7, 133 end)
-	-- A plain pixel of the inner bevel tints the header and selected fills; the
-	-- purple one is within a few levels of the former 35085C / 340657 panels.
-	card_sprite("tint", function(l, t) return l + 7, t + 100, 1, 1 end)
+	-- Below the corners the header gradient continues to 47 px, then the body is
+	-- flat with a 15 px glow inside both side rims.
+	card_sprite("grad", function(l, t) return l + 22, t + 25, 1, 22 end)
+	card_sprite("body", function(l, t) return l + 22, t + 70, 1, 1 end)
+	card_sprite("glow_l", function(l, t) return l + 7, t + 70, 15, 1 end)
+	card_sprite("glow_r", function(_, t, r) return r - 22, t + 70, 15, 1 end)
+	-- The button keeps the normal panel's 1:1 height and is three-sliced to fill
+	-- the column. Its 15 px rounded caps come from a button on the same-colour
+	-- card, so the matte around the rounding is that card's own fill and glow,
+	-- which the column draws at the same offsets. The middle column is neutral.
+	card_sprite("button_l", function(l, t, _, _, card) return l + 16, t + card[7], 15, 38 end)
+	card_sprite("button_r", function(_, t, r, _, card) return r - 31, t + card[7], 15, 38 end)
+	sprite("button_m", "panel", 690, 277, 20, 38)
+	-- Register every category part above as one imageset per column.
 	for slot = 0, 8 do
 		for _, part in ipairs(category_parts) do
 			local images = {}
@@ -130,20 +148,10 @@ local function load()
 				value = 19401 + slot * 10, images = images})
 		end
 	end
-	-- The old 176x39 crop includes purple outside the rounded 175x38 button.
-	-- These disjoint bands retain only the neutral button pixels, not its matte.
-	local button_bands, button_y = {}, 0
-	for index, band in ipairs({
-		{1, 10}, {1, 6}, {1, 4}, {1, 3}, {2, 2}, {4, 1}, {18, 0},
-		{4, 1}, {2, 2}, {1, 3}, {1, 4}, {1, 6}, {1, 10},
-	}) do
-		local h, inset = band[1], band[2]
-		local id = "button_" .. index
-		sprite(id, "panel", 623 + inset, 277 + button_y, 175 - inset * 2, h)
-		table.insert(button_bands, {id, inset, button_y, 175 - inset * 2, h})
-		button_y = button_y + h
-	end
-	sprite("value_selected", "cursor", 0, 500, 213, 76)
+	-- The cursor glows 19 px beyond the button; its caps cover that and the button cap.
+	sprite("value_selected_l", "cursor", 0, 500, 37, 76)
+	sprite("value_selected_m", "cursor", 96, 500, 20, 76)
+	sprite("value_selected_r", "cursor", 176, 500, 37, 76)
 	hit("blocker", 0)
 	table.insert(parts.destination, {id = prefix .. "blocker", op = {19300, 22}, dst = {{x = 0, y = 0, w = 1920, h = 1080}}})
 	table.insert(parts.destination, {id = prefix .. "shade", op = {19300, 22}, timer = 22, loop = 300,
@@ -163,63 +171,79 @@ local function load()
 				options, slot, nil, alpha)
 		end
 	end
-	local function fill(id, x, row, slot, header, alpha)
-		draw(id, x + 7, 204, width - 14, header and 46 or 502, {row}, slot, nil, alpha)
+	-- Opaque card fill like the normal panel: header gradient, flat body, side glow.
+	local function fill(x, row, slot)
 		for _, band in ipairs(fill_bands) do
-			local y, h, inset = band[1], band[2], band[3]
-			draw(id, x + inset, 180 + y, width - inset * 2, h, {row}, slot, nil, alpha)
-			if not header then
-				draw(id, x + inset, 730 - y - h, width - inset * 2, h, {row}, slot, nil, alpha)
-			end
+			local y, h, inset, id = band[1], band[2], band[3], band[4]
+			draw(id .. "_" .. slot, x + inset, 180 + y, width - inset * 2, h, {row}, slot)
+			draw("body_" .. slot, x + inset, 730 - y - h, width - inset * 2, h, {row}, slot)
 		end
+		draw("grad_" .. slot, x + 7, 204, width - 14, 22, {row}, slot)
+		draw("body_" .. slot, x + 7, 226, width - 14, 480, {row}, slot)
+		draw("glow_l_" .. slot, x + 7, 226, 15, 480, {row}, slot)
+		draw("glow_r_" .. slot, x + width - 22, 226, 15, 480, {row}, slot)
 	end
-	local function button(x, y, scale, cell, slot)
-		for _, band in ipairs(button_bands) do
-			-- Share rounded edges between bands: rounding height independently would
-			-- leave horizontal gaps when the 39 px source is enlarged to 50 px.
-			local x1 = math.floor(x + band[2] * scale + 0.5)
-			local x2 = math.floor(x + (band[2] + band[4]) * scale + 0.5)
-			local y1 = math.floor(y + band[3] * scale + 0.5)
-			local y2 = math.floor(y + (band[3] + band[5]) * scale + 0.5)
-			draw(band[1], x1, y1, x2 - x1, y2 - y1, {cell}, slot)
-		end
+	local button_width = width - 32
+	local function button(x, y, cell, slot)
+		draw("button_l_" .. slot, x, y, 15, 38, {cell}, slot)
+		draw("button_m", x + 15, y, button_width - 30, 38, {cell}, slot)
+		draw("button_r_" .. slot, x + button_width - 15, y, 15, 38, {cell}, slot)
 	end
+	local function cursor(x, y, options, slot)
+		draw("value_selected_l", x - 19, y - 19, 37, 76, options, slot)
+		draw("value_selected_m", x + 18, y - 19, button_width - 36, 76, options, slot)
+		draw("value_selected_r", x + button_width - 18, y - 19, 37, 76, options, slot)
+	end
+	-- Header gradient, title, then 1:1 buttons every 41 px as on the normal cards.
+	local first = 244
 	for slot = 0, 8 do
 		local column = slot == 7 and -1 or slot == 8 and 7 or slot
 		local x, row, id = left + column * pitch, 19400 + slot * 10, "row_" .. slot
 		hit(id .. "_hit", 19310 + slot)
-		text(id .. "_label", row, 26, 1)
+		text(id .. "_label", row, 24, 1, "choices")
+		text(id .. "_caption", row + 3, 14, 1, "choices")
 		text(id .. "_status", row + 2, 18, 1, "small")
 		text(id .. "_external", row + 1, 26, 1, "choices")
 		draw(id .. "_hit", x, 180, width, 550, {row}, slot)
-		fill("column", x, row, slot)
-		fill("tint_" .. slot, x, row + 1, slot, false, 128)
-		fill("tint_" .. slot, x, row, slot, true, 160)
-		border(x, {row, -(row + 1)}, slot, 100)
-		border(x, {row + 1}, slot, 255)
-		draw(id .. "_label", x + width / 2, 208, width - 24, 36, {row}, slot)
-		draw(id .. "_status", x + width / 2, 698, width - 24, 22, {row}, slot, {255, 214, 158})
-		draw(id .. "_external", x + width / 2, 652, width - 24, 34, {row, row + 4}, slot, {255, 214, 158})
+		fill(x, row, slot)
+		-- Only the centre slot is ever selected, so each slot draws one rim set.
+		if slot == 3 then
+			border(x, {row + 1}, slot, 255)
+		else
+			border(x, {row}, slot, 100)
+		end
+		draw(id .. "_label", x + width / 2, 198, width - 24, 32, {row}, slot)
+		-- Like the normal cards, the English category caption sits at the bottom in
+		-- the card's light rim colour.
+		for _, name in ipairs({"blue", "green", "orange", "red", "purple"}) do
+			local categories, terms = {}, {}
+			for category, color in ipairs(category_colors) do
+				if color == name and category > 1 then table.insert(categories, category - 1) end
+			end
+			for _, category in ipairs(categories) do
+				table.insert(terms, "number(" .. (row + 1) .. ")==" .. category)
+			end
+			draw(id .. "_caption", x + width / 2, 702, width - 24, 18, {row}, slot, cards[name][6],
+				nil, table.concat(terms, " || "))
+		end
+		draw(id .. "_status", x + width / 2, 662, width - 24, 22, {row}, slot, {255, 214, 158})
+		draw(id .. "_external", x + width / 2, 616, width - 24, 34, {row, row + 4}, slot, {255, 214, 158})
 		for choice = 0, 7 do
 			local cell = 19500 + slot * 64 + choice * 4
-			local name, y = id .. "_choice_" .. choice, 274 + choice * 52
+			local name, y = id .. "_choice_" .. choice, first + choice * 41
 			hit(name .. "_hit", cell)
-			text(name, cell, 26, 1, "choices")
-			-- Apply the same uniform scale to both source images. The cursor has
-			-- a 19 px glow margin outside the button in the original option panel.
-			local scale = 226 / 176
-			button(x + 16, y, scale, cell, slot)
-			draw("value_selected", x + 16 - 19 * scale, y - 19 * scale, 213 * scale, 76 * scale, {cell + 1}, slot)
+			text(name, cell, 20, 1, "choices")
+			button(x + 16, y, cell, slot)
+			cursor(x + 16, y, {cell + 1}, slot)
 			-- Keep the visible cap height and center with Noto Sans CJK's metrics.
-			draw(name, x + width / 2, y + 4, 210, 38, {cell, row + 3}, slot)
-			draw(name, x + width / 2, y + 4, 210, 38, {cell, -(row + 3)}, slot, {172, 172, 172})
-			draw(name .. "_hit", x + 10, y, 238, 50, {cell + 2}, slot)
+			draw(name, x + width / 2, y + 3, 210, 32, {cell, row + 3}, slot)
+			draw(name, x + width / 2, y + 3, 210, 32, {cell, -(row + 3)}, slot, {172, 172, 172})
+			draw(name .. "_hit", x + 16, y, button_width, 38, {cell + 2}, slot)
 		end
-		text(id .. "_number", row + 1, 26, 1, "choices")
-		button(x + 16, 274, 226 / 176, row + 5, slot)
-		draw("value_selected", x + 16 - 19 * 226 / 176, 274 - 19 * 226 / 176,
-			213 * 226 / 176, 76 * 226 / 176, {row + 5}, slot)
-		draw(id .. "_number", x + width / 2, 278, 210, 38, {row + 5}, slot)
+		text(id .. "_number", row + 1, 20, 1, "choices")
+		button(x + 16, first, row + 5, slot)
+		cursor(x + 16, first, {row + 5}, slot)
+		draw(id .. "_number", x + width / 2, first + 3, 210, 32, {row + 5}, slot)
 	end
 	draw("footer", 9, 746, 1902, 178)
 	text("category", 19302, 26)
