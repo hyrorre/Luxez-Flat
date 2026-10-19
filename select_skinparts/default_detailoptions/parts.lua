@@ -71,7 +71,9 @@ local function load()
 	local cards = {
 		blue = {"panel3", 483, 712, 690, 957, {76, 242, 254}, 85}, -- BGA
 		green = {"panel1", 749, 334, 956, 702, {76, 254, 97}, 85}, -- groove gauge
-		orange = {"panel3", 414, 133, 671, 460, {254, 177, 76}, 85}, -- GAS
+		-- GAS supplies the card and buttons. Its wide title reaches both glow
+		-- strips, so only the header fill comes from the clean LANE STYLE card.
+		orange = {"panel3", 414, 133, 671, 460, {254, 177, 76}, 85, {"panel1", 539, 334, 746}},
 		red = {"panel3", 713, 713, 920, 917, {254, 75, 75}, 85}, -- auto adjust
 		purple = {"panel", 607, 172, 814, 355, {176, 75, 254}, 105}, -- assist
 	}
@@ -82,10 +84,11 @@ local function load()
 	-- Slice the same part from every card and register an imageset per column
 	-- that picks the colour from that row's category_id, so the columns need no
 	-- extra destinations or draw conditions.
-	local function card_sprite(id, slice)
+	local function card_sprite(id, slice, header)
 		for name, card in pairs(cards) do
-			local x, y, w, h = slice(card[2], card[3], card[4], card[5], card)
-			sprite(id .. "_" .. name, card[1], x, y, w, h)
+			local source = header and card[8] or card
+			local x, y, w, h = slice(source[2], source[3], source[4], source[5], card)
+			sprite(id .. "_" .. name, source[1], x, y, w, h)
 		end
 		table.insert(category_parts, id)
 	end
@@ -146,9 +149,9 @@ local function load()
 	-- Below the corners the header gradient continues to 47 px, then the body is
 	-- flat. A 15 px glow runs inside both side rims from top to bottom; cutting it
 	-- at the gradient's end would leave a visible step.
-	card_sprite("grad", function(l, t) return l + 22, t + 25, 1, 22 end)
-	card_sprite("grad_l", function(l, t) return l + 7, t + 25, 15, 22 end)
-	card_sprite("grad_r", function(_, t, r) return r - 22, t + 25, 15, 22 end)
+	card_sprite("grad", function(l, t) return l + 22, t + 25, 1, 22 end, true)
+	card_sprite("grad_l", function(l, t) return l + 7, t + 25, 15, 22 end, true)
+	card_sprite("grad_r", function(_, t, r) return r - 22, t + 25, 15, 22 end, true)
 	card_sprite("body", function(l, t) return l + 22, t + 70, 1, 1 end)
 	card_sprite("glow_l", function(l, t) return l + 7, t + 70, 15, 1 end)
 	card_sprite("glow_r", function(_, t, r) return r - 22, t + 70, 15, 1 end)
@@ -263,15 +266,25 @@ local function load()
 			hit(name .. "_hit", cell)
 			text(name, cell, 20, 1, "choices")
 			button(x + 16, y, cell, slot)
+		end
+		text(id .. "_number", row + 1, 20, 1, "choices")
+		-- A number has no choice to highlight: draw it in an unselected button.
+		button(x + 16, first, row + 5, slot)
+		-- As on the normal panel, finish every button before drawing any cursor.
+		-- Otherwise the next button's opaque cap cuts a rectangle out of the glow.
+		for choice = 0, 7 do
+			local cell, y = 19500 + slot * 64 + choice * 4, first + choice * 41
 			cursor(x + 16, y, {cell + 1}, slot)
+		end
+		-- Labels sit above all glows, including the neighbouring choices' halos.
+		for choice = 0, 7 do
+			local cell = 19500 + slot * 64 + choice * 4
+			local name, y = id .. "_choice_" .. choice, first + choice * 41
 			-- Keep the visible cap height and center with Noto Sans CJK's metrics.
 			draw(name, x + width / 2, y + 1, 210, 32, {cell, row + 3}, slot)
 			draw(name, x + width / 2, y + 1, 210, 32, {cell, -(row + 3)}, slot, {172, 172, 172})
 			draw(name .. "_hit", x + 16, y, button_width, 38, {cell + 2}, slot)
 		end
-		text(id .. "_number", row + 1, 20, 1, "choices")
-		-- A number has no choice to highlight: draw it in an unselected button.
-		button(x + 16, first, row + 5, slot)
 		draw(id .. "_number", x + width / 2, first + 1, 210, 32, {row + 5}, slot)
 	end
 	draw("footer", 9, 746, 1902, 178)
