@@ -37,7 +37,11 @@ local function load()
 	end
 	-- Coordinates below use a top-left origin. Match the original 300 ms opening
 	-- and closing easing; moving hit areas exist only while E2 is active.
+	-- The selected item always occupies the centre slot 3; raise that column so
+	-- it stands out, including its hit areas and the frozen exit.
+	local selected_raise = 24
 	local function draw(id, x, y, w, h, options, slot, color, alpha, when)
+		if slot == 3 then y = y - selected_raise end
 		local op = {19300, 22}
 		for _, value in ipairs(options or {}) do table.insert(op, value) end
 		local frame = {time = 0, x = x - 1920, y = 1080 - y - h, w = w, h = h, acc = 2, a = alpha or 255}
