@@ -115,25 +115,34 @@ local function load()
 		if dy >= 7 then
 			-- The opaque fill copies the card itself: each rounded top row takes the
 			-- header gradient at the same height, from a column clear of the title,
-			-- plus the glow inside both rims; bottom rows take the body's glow profile.
+			-- plus the glow inside both rims; bottom rows retain their curved shading.
 			local band = "row_" .. index
-			card_sprite("grad_" .. band, function(l, t) return l + 22, t + 1 + offset, 1, h end)
+			card_sprite("grad_" .. band, function(l, t) return l + 24, t + 1 + offset, 1, h end)
 			card_sprite("grad_" .. band .. "_l", function(l, t)
-				return l + inner, t + 1 + offset, 22 - inner, h
+				return l + inner, t + 1 + offset, 24 - inner, h
 			end)
 			card_sprite("grad_" .. band .. "_r", function(_, t, r)
-				return r - 22, t + 1 + offset, 22 - inner, h
+				return r - 24, t + 1 + offset, 24 - inner, h
 			end)
-			card_sprite("body_" .. band .. "_l", function(l, t) return l + inner, t + 70, 22 - inner, 1 end)
-			card_sprite("body_" .. band .. "_r", function(_, t, r) return r - 22, t + 70, 22 - inner, 1 end)
+			card_sprite("body_" .. band, function(l, _, _, b) return l + 24, b - 1 - offset - h, 1, h end)
+			card_sprite("body_" .. band .. "_l", function(l, _, _, b)
+				return l + inner, b - 1 - offset - h, 24 - inner, h
+			end)
+			card_sprite("body_" .. band .. "_r", function(_, _, r, b)
+				return r - 24, b - 1 - offset - h, 24 - inner, h
+			end)
 			table.insert(fill_bands, {dy, h, inner, band})
 		end
 		dy = dy + h
 	end
 	card_sprite("top", function(l, t) return l + 24, t + 1, 159, 7 end)
 	card_sprite("bottom", function(l, _, _, b) return l + 24, b - 8, 159, 7 end)
-	card_sprite("left", function(l, t) return l, t + 25, 7, 133 end)
-	card_sprite("right", function(_, t, r) return r - 7, t + 25, 7, 133 end)
+	-- Keep the header's bevel at its original height. Stretching it with the body
+	-- would change its slope at the join with the unscaled corners.
+	card_sprite("left_header", function(l, t) return l, t + 25, 7, 22 end)
+	card_sprite("right_header", function(_, t, r) return r - 7, t + 25, 7, 22 end)
+	card_sprite("left", function(l, t) return l, t + 70, 7, 1 end)
+	card_sprite("right", function(_, t, r) return r - 7, t + 70, 7, 1 end)
 	-- Below the corners the header gradient continues to 47 px, then the body is
 	-- flat. A 15 px glow runs inside both side rims from top to bottom; cutting it
 	-- at the gradient's end would leave a visible step.
@@ -178,7 +187,8 @@ local function load()
 		end
 		for _, piece in ipairs({
 			{"top", x + 24, 180, width - 48, 7}, {"bottom", x + 24, 723, width - 48, 7},
-			{"left", x, 204, 7, 502}, {"right", x + width - 7, 204, 7, 502},
+			{"left_header", x, 204, 7, 22}, {"right_header", x + width - 7, 204, 7, 22},
+			{"left", x, 226, 7, 480}, {"right", x + width - 7, 226, 7, 480},
 		}) do
 			draw(piece[1] .. "_" .. slot, piece[2], piece[3], piece[4], piece[5],
 				options, slot, nil, alpha)
@@ -187,15 +197,16 @@ local function load()
 	-- Opaque card fill like the normal panel: header gradient, flat body, side glow.
 	local function fill(x, row, slot)
 		-- Each row is a stretched centre with the unstretched glow edges on top.
-		local function three(id, center, y, h, inset)
+		local function three(id, center, y, h, inset, edge)
+			edge = edge or 22
 			draw(center .. "_" .. slot, x + inset, y, width - inset * 2, h, {row}, slot)
-			draw(id .. "_l_" .. slot, x + inset, y, 22 - inset, h, {row}, slot)
-			draw(id .. "_r_" .. slot, x + width - 22, y, 22 - inset, h, {row}, slot)
+			draw(id .. "_l_" .. slot, x + inset, y, edge - inset, h, {row}, slot)
+			draw(id .. "_r_" .. slot, x + width - edge, y, edge - inset, h, {row}, slot)
 		end
 		for _, band in ipairs(fill_bands) do
 			local y, h, inset, id = band[1], band[2], band[3], band[4]
-			three("grad_" .. id, "grad_" .. id, 180 + y, h, inset)
-			three("body_" .. id, "body", 730 - y - h, h, inset)
+			three("grad_" .. id, "grad_" .. id, 180 + y, h, inset, 24)
+			three("body_" .. id, "body_" .. id, 730 - y - h, h, inset, 24)
 		end
 		three("grad", "grad", 204, 22, 7)
 		three("glow", "body", 226, 480, 7)
