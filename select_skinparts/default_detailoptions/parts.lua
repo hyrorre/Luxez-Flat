@@ -26,10 +26,11 @@ local function load()
 	local function sprite(id, src, x, y, w, h)
 		table.insert(parts.image, {id = prefix .. id, src = prefix .. src, x = x, y = y, w = w, h = h})
 	end
-	local function text(id, ref, size, align, font)
+	local function text(id, ref, size, align, font, outline)
 		local font_id = prefix .. (font or "font")
 		table.insert(parts.text, {id = prefix .. id, ref = ref, font = font_id,
-			size = size, align = align or 0, overflow = 1})
+			size = size, align = align or 0, overflow = 1,
+			outlineColor = outline and "000000FF" or nil, outlineWidth = outline})
 	end
 	local function hit(id, event)
 		table.insert(parts.image, {id = prefix .. id, src = -1, w = 1, h = 1, act = event, clickable = true})
@@ -113,9 +114,18 @@ local function load()
 		end
 		if dy >= 7 then
 			-- The opaque fill copies the card itself: each rounded top row takes the
-			-- header gradient at the same height, from a column clear of the title.
-			local band = "grad_row_" .. index
-			card_sprite(band, function(l, t) return l + 22, t + 1 + offset, 1, h end)
+			-- header gradient at the same height, from a column clear of the title,
+			-- plus the glow inside both rims; bottom rows take the body's glow profile.
+			local band = "row_" .. index
+			card_sprite("grad_" .. band, function(l, t) return l + 22, t + 1 + offset, 1, h end)
+			card_sprite("grad_" .. band .. "_l", function(l, t)
+				return l + inner, t + 1 + offset, 22 - inner, h
+			end)
+			card_sprite("grad_" .. band .. "_r", function(_, t, r)
+				return r - 22, t + 1 + offset, 22 - inner, h
+			end)
+			card_sprite("body_" .. band .. "_l", function(l, t) return l + inner, t + 70, 22 - inner, 1 end)
+			card_sprite("body_" .. band .. "_r", function(_, t, r) return r - 22, t + 70, 22 - inner, 1 end)
 			table.insert(fill_bands, {dy, h, inner, band})
 		end
 		dy = dy + h
@@ -125,8 +135,11 @@ local function load()
 	card_sprite("left", function(l, t) return l, t + 25, 7, 133 end)
 	card_sprite("right", function(_, t, r) return r - 7, t + 25, 7, 133 end)
 	-- Below the corners the header gradient continues to 47 px, then the body is
-	-- flat with a 15 px glow inside both side rims.
+	-- flat. A 15 px glow runs inside both side rims from top to bottom; cutting it
+	-- at the gradient's end would leave a visible step.
 	card_sprite("grad", function(l, t) return l + 22, t + 25, 1, 22 end)
+	card_sprite("grad_l", function(l, t) return l + 7, t + 25, 15, 22 end)
+	card_sprite("grad_r", function(_, t, r) return r - 22, t + 25, 15, 22 end)
 	card_sprite("body", function(l, t) return l + 22, t + 70, 1, 1 end)
 	card_sprite("glow_l", function(l, t) return l + 7, t + 70, 15, 1 end)
 	card_sprite("glow_r", function(_, t, r) return r - 22, t + 70, 15, 1 end)
@@ -173,15 +186,19 @@ local function load()
 	end
 	-- Opaque card fill like the normal panel: header gradient, flat body, side glow.
 	local function fill(x, row, slot)
+		-- Each row is a stretched centre with the unstretched glow edges on top.
+		local function three(id, center, y, h, inset)
+			draw(center .. "_" .. slot, x + inset, y, width - inset * 2, h, {row}, slot)
+			draw(id .. "_l_" .. slot, x + inset, y, 22 - inset, h, {row}, slot)
+			draw(id .. "_r_" .. slot, x + width - 22, y, 22 - inset, h, {row}, slot)
+		end
 		for _, band in ipairs(fill_bands) do
 			local y, h, inset, id = band[1], band[2], band[3], band[4]
-			draw(id .. "_" .. slot, x + inset, 180 + y, width - inset * 2, h, {row}, slot)
-			draw("body_" .. slot, x + inset, 730 - y - h, width - inset * 2, h, {row}, slot)
+			three("grad_" .. id, "grad_" .. id, 180 + y, h, inset)
+			three("body_" .. id, "body", 730 - y - h, h, inset)
 		end
-		draw("grad_" .. slot, x + 7, 204, width - 14, 22, {row}, slot)
-		draw("body_" .. slot, x + 7, 226, width - 14, 480, {row}, slot)
-		draw("glow_l_" .. slot, x + 7, 226, 15, 480, {row}, slot)
-		draw("glow_r_" .. slot, x + width - 22, 226, 15, 480, {row}, slot)
+		three("grad", "grad", 204, 22, 7)
+		three("glow", "body", 226, 480, 7)
 	end
 	local button_width = width - 32
 	local function button(x, y, cell, slot)
@@ -200,7 +217,8 @@ local function load()
 		local column = slot == 7 and -1 or slot == 8 and 7 or slot
 		local x, row, id = left + column * pitch, 19400 + slot * 10, "row_" .. slot
 		hit(id .. "_hit", 19310 + slot)
-		text(id .. "_label", row, 24, 1, "choices")
+		-- Black-edged like the titles printed on the normal cards.
+		text(id .. "_label", row, 24, 1, "choices", 2)
 		text(id .. "_caption", row + 3, 14, 1, "choices")
 		text(id .. "_status", row + 2, 18, 1, "small")
 		text(id .. "_external", row + 1, 26, 1, "choices")
@@ -236,14 +254,14 @@ local function load()
 			button(x + 16, y, cell, slot)
 			cursor(x + 16, y, {cell + 1}, slot)
 			-- Keep the visible cap height and center with Noto Sans CJK's metrics.
-			draw(name, x + width / 2, y + 3, 210, 32, {cell, row + 3}, slot)
-			draw(name, x + width / 2, y + 3, 210, 32, {cell, -(row + 3)}, slot, {172, 172, 172})
+			draw(name, x + width / 2, y + 1, 210, 32, {cell, row + 3}, slot)
+			draw(name, x + width / 2, y + 1, 210, 32, {cell, -(row + 3)}, slot, {172, 172, 172})
 			draw(name .. "_hit", x + 16, y, button_width, 38, {cell + 2}, slot)
 		end
 		text(id .. "_number", row + 1, 20, 1, "choices")
+		-- A number has no choice to highlight: draw it in an unselected button.
 		button(x + 16, first, row + 5, slot)
-		cursor(x + 16, first, {row + 5}, slot)
-		draw(id .. "_number", x + width / 2, first + 3, 210, 32, {row + 5}, slot)
+		draw(id .. "_number", x + width / 2, first + 1, 210, 32, {row + 5}, slot)
 	end
 	draw("footer", 9, 746, 1902, 178)
 	text("category", 19302, 26)
