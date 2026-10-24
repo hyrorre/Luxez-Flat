@@ -1,9 +1,9 @@
 main_state = require("main_state")
 
-local luajava = require("luajava")
-local Gdx = luajava.bindClass("com.badlogic.gdx.Gdx")
+-- local luajava = require("luajava")
+-- local Gdx = luajava.bindClass("com.badlogic.gdx.Gdx")
 
-local input = luajava.bindClass("com.badlogic.gdx.Input")
+-- local input = luajava.bindClass("com.badlogic.gdx.Input")
 local result_mode = 0
 local pattern_mode = 0
 local stagefile_gazou_on = 0
@@ -370,13 +370,17 @@ local function main()
 	}
 
 	skin.value = {
+		{id = "dummy_for_result_mode",		src = "figure", x = 0, y = 0, w = 170, h = 25, divx = 10, digit = 6, ref = 170, align = 2,
+			value = function()
+				-- if Gdx.input:isKeyPressed(input.Keys.RIGHT) then
+				if main_state.key_pressed(22) then
+					result_mode = 1
+				--if Gdx.input:isKeyPressed(input.Keys.LEFT) then
+				elseif main_state.key_pressed(21) then
+					result_mode = 0
+			end
+		end},
 		{id = "rank_diff_count",				src = "figure", x = 0, y = 150, w = 121, h = 15, divx = 11, digit = 4, align = 0, space = -1, value = function()
-			if Gdx.input:isKeyPressed(input.Keys.RIGHT) then
-				result_mode = 1
-			end
-			if Gdx.input:isKeyPressed(input.Keys.LEFT) then
-				result_mode = 0
-			end
 			-- rank_plus = (skin_config.option["RANK+表記"] == op.RANK_PLUS_ON)
 			rank_plus = true
 			
@@ -1073,6 +1077,8 @@ local function main()
 		{id = "current_dot", draw = function() return main_state.number(102) <= 9 end, loop = timer_tag[2], dst = {{time = timer_tag[1], x = frame_position.x+362+35-123+135-9 + result_r, y = frame_position.y+722-90+10, w = 5, h = 5, a = 0},{time = timer_tag[2], y = frame_position.y+722-90, a = 255}}},
 		{id = "current_per", draw = function() return  main_state.number(102) <= 9 end, loop = timer_tag[2], dst = {{time = timer_tag[1], x = frame_position.x+362+31-123+30+135-9 + result_r, y = frame_position.y+722-90+10, w = 16, h = 14, a = 0},{time = timer_tag[2], y = frame_position.y+722-90, a = 255}}},
 		
+		{id = "dummy_for_result_mode", draw = function() return false end, loop = timer_tag[2], dst = {{time = timer_tag[1], x = frame_position.x+362+31-123+30+135-25 + result_r, y = frame_position.y+722-118+71+19+10, w = 11, h = 15, a = 0},{time = timer_tag[2], y = frame_position.y+722-118+71+19, a = 255}}},
+
 		--rank_plus_on
 		{id = "rank_diff_f_plus", draw = function() return rank_plus and scorerate < 2/18 and scorerate >= 0/18 end,	loop = timer_tag[2], dst = {{time = timer_tag[1], x = frame_position.x+362+31-123+30+135-62 + result_r, y = frame_position.y+722-118+71+19+10, w = 50, h = 15, a = 0},{time = timer_tag[2], y = frame_position.y+722-118+71+19, a = 255}}},
 		{id = "rank_diff_count", draw = function() return rank_plus and scorerate < 2/18 and scorerate >= 0/18 end, loop = timer_tag[2], dst = {{time = timer_tag[1], x = frame_position.x+362+31-123+30+135-25 + result_r, y = frame_position.y+722-118+71+19+10, w = 11, h = 15, a = 0},{time = timer_tag[2], y = frame_position.y+722-118+71+19, a = 255}}},

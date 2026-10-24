@@ -1,6 +1,6 @@
-beatoraja用スキン　Luxe Flat (beta) ver 1.3.0a
+beatoraja用スキン　Luxe Flat (beta) ver 1.3.1
 
-last updated: 2024/09/22
+last updated: 2026/10/23
 released: 2023/02/15
 
 
@@ -11,7 +11,7 @@ released: 2023/02/15
 ■動作環境
 
 ・対応本体
-　 beatoraja 0.8.7  推奨
+　 beatoraja 0.8.9  推奨
 
 ・解像度
 　FULLHD(1920×1080) 、FULLSCREEN  推奨
@@ -44,7 +44,7 @@ released: 2023/02/15
 
 フォントの扱いについては同梱しているライセンスをご覧ください
 
-2024/09/22 EGRET.
+2026/10/23 E
 
 
 
