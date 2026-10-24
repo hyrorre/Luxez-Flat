@@ -1,25 +1,10 @@
 EGRET.氏により作成された Luxe Flat をベースに、bmz-player 向けの拡張を加えたスキンです。
 
-選曲画面のBMZ拡張（DETAIL OPTIONS）:
-・E2 holdで本体共通の詳細設定15項目を表示します。横7列の中央が選択中で、項目は循環します。
-・スクラッチ/左右で項目移動、奇数鍵/下で値を次へ、偶数鍵/上で前へ変更します。
-  列見出し・選択肢のクリック、ホイールも利用できます。E2解放で閉じて変更を保存します。
-・通常パネルのカードと同じ角丸枠・塗り・黒い値欄・オレンジのカーソルを再利用し、値欄は通常パネルと同じ高さで表示します。カードは項目の大分類で色が変わり（判定・レーン/ハイスピードはシアン、ゲージは緑、LNは橙、BGAは赤、アシストは紫）、下端に大分類を英語で表示します。項目名・候補・現在値はNoto Sans CJK JP Medium（500）を縁取りなしで、説明は曲情報/IR欄のフォントで表示します。
-・追加フォントの出典とライセンスはselect_skinparts/default_detailoptions/font/に同梱しています。
-  背景は透過し、表示は項目一覧・カテゴリ・現在値・説明・保存量・理由に絞っています。
-  三角・丸のマーカー、パネルタイトル、操作ガイドは表示しません。
-・300msで左から開き、左へ戻って閉じます。E2とE1+E2の切り替えでは退出と登場を並行再生します。
-  退出中のE2は編集できません。切り替え先のパネルを操作し、全パネルを閉じる間は背後のクリックを遮断します。
-・select_skinparts/enable.txtのdefault_detailoptions/parts.luaが正常ロードされた場合だけ有効です。
-  無効・欠落・失敗時とbeatorajaでは従来のAssist表示と固定7鍵操作を維持します。
-  E1とE1+E2の操作・表示は従来どおりです。旧EXTRA MODEのADD設定は新パネルに追加していません。
-この拡張にはDETAIL OPTIONS v1、選択肢セル、bmzDetailScroll、bmzDetailOptionsClose対応のBMZ Playerが必要です。
-
 --- 以下、readme.txt 原文 ---
 
-beatoraja用スキン　Luxe Flat (beta) ver 1.3.0a
+beatoraja用スキン　Luxe Flat (beta) ver 1.3.1
 
-last updated: 2024/09/22
+last updated: 2026/10/23
 released: 2023/02/15
 
 
@@ -30,7 +15,7 @@ released: 2023/02/15
 ■動作環境
 
 ・対応本体
-　 beatoraja 0.8.7  推奨
+　 beatoraja 0.8.9  推奨
 
 ・解像度
 　FULLHD(1920×1080) 、FULLSCREEN  推奨
@@ -63,7 +48,7 @@ released: 2023/02/15
 
 フォントの扱いについては同梱しているライセンスをご覧ください
 
-2024/09/22 EGRET.
+2026/10/23 E
 
 
 
