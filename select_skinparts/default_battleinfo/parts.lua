@@ -64,14 +64,22 @@ local function load()
 			double and 302 or 709, double and 663 or 664, double and 412 or 413, double and 284 or 150
 		-- Reassemble clean native strips: retain the glow, corners, header dot and alpha,
 		-- and omit the original SCORE/BREAK/LAMP or judgment labels and divider.
+		-- An 11 px rim and a 25 px inner glow run down both sides into the bottom corners.
+		-- The labels tint the left glow, so the clean right glow is mirrored there
+		-- (negative width). Only the flat centre column is stretched.
+		local edge, body = 36, h - 57
 		local strips = {
-			{"head_left", 0, 0, 32, 38, 0, 0, 32, 38},
-			{"head_middle", 250, 0, 1, 38, 32, 0, w - 64, 38},
+			-- The dot's glow reaches the title, so keep all of it left of the title.
+			{"head_left", 0, 0, 36, 38, 0, 0, 36, 38},
+			{"head_middle", 250, 0, 1, 38, 36, 0, w - 68, 38},
 			{"head_right", 381, 0, 32, 38, w - 32, 0, 32, 38},
-			{"left", 0, 38, 10, h - 38, 0, 38, 10, h - 38},
-			{"middle", 175, 38, 1, h - 57, 10, 38, w - 20, h - 57},
-			{"right", 403, 38, 10, h - 38, w - 10, 38, 10, h - 38},
-			{"bottom", 10, h - 19, 393, 19, 10, h - 19, w - 20, 19},
+			{"left", 0, 38, 11, body, 0, 38, 11, body},
+			{"left_glow", 377, 38, 25, body, edge, 38, -25, body},
+			{"middle", 175, 38, 1, body, edge, 38, w - edge * 2, body},
+			{"right", 377, 38, edge, body, w - edge, 38, edge, body},
+			{"bottom_left", 0, h - 19, edge, 19, 0, h - 19, edge, 19},
+			{"bottom", 175, h - 19, 1, 19, edge, h - 19, w - edge * 2, 19},
+			{"bottom_right", 377, h - 19, edge, 19, w - edge, h - 19, edge, 19},
 		}
 		for index, strip in ipairs(strips) do
 			if double or index > 3 then
