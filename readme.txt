@@ -15,6 +15,16 @@ EGRET.氏により作成された Luxe Flat をベースに、bmz-player 向け�
   E1とE1+E2の操作・表示は従来どおりです。旧EXTRA MODEのADD設定は新パネルに追加していません。
 この拡張にはDETAIL OPTIONS v1、選択肢セル、bmzDetailScroll、bmzDetailOptionsClose対応のBMZ Playerが必要です。
 
+選曲画面のBMZ拡張（G-BATTLE相手情報）:
+・SPは既存のRIVAL DATA欄、10K/14KのDPは左下のIR DATA / SCORE DETAIL欄に表示します。
+  DPでは右側のRIVAL DATA / SCORE DATAを維持し、1P/2Pの配置を上下に分けます。
+・配置オプションは通常パネルの画像、鍵盤はリザルトの画像を25×35px・27px間隔で流用します。
+  枠・見出し・文字は既存素材を使います。相手名、項目ラベル、ゲージ名は追加しません。
+・未取得はNO DATA、読み込み中はLOADING、可変配置はNOT FIXEDです。NO PLAYと同じ灰色で表示します。
+  自分のオプションから推測した値は表示しません。下段にはCHART REPLICATIONの現在値を表示します。
+・一覧を閉じると元のパネルへ戻ります。default_battleinfo/parts.luaの無効・欠落・失敗時と
+  BMZ以外では元の表示を維持します。BMZ PlayerのG-BATTLE相手情報API（20200..20229）が必要です。
+
 --- 以下、readme.txt 原文 ---
 
 beatoraja用スキン　Luxe Flat (beta) ver 1.3.0a
