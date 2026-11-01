@@ -8,6 +8,7 @@ default_info/parts.lua
 default_chart/parts.lua
 default_scoredata/parts.lua
 default_rivaldata/parts.lua
+default_battleinfo/parts.lua
 default_modechange/parts.lua
 default_search/parts.lua
 default_songlistscroll/parts.lua

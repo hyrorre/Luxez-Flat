@@ -111,6 +111,21 @@ function load_parts()
 			if skin_config then
 				local parts_status, parts = pcall(function() return dofile(path).load() end)
 				if parts_status and parts then
+					if parts.bmzBattleInfo == true then skin.bmzBattleInfo = true end
+					-- Mark only the two native base panels, not the rival picker or modal windows.
+					local slot = l == "default_scoredata/parts.lua" and "sp"
+						or ((l == "default_modebotton/parts.lua" or l == "default_irdata/parts.lua") and "dp")
+					if slot then
+						for _, destination in ipairs(parts.destination or {}) do
+							local frame = destination.dst and destination.dst[1]
+							if frame and frame.x and frame.y and
+								((slot == "sp" and frame.x >= 709 and frame.x < 1123 and frame.y >= 266 and frame.y < 416)
+								or (slot == "dp" and not destination.timer and not destination.loop and not destination.mouseRect
+									and frame.x >= 302 and frame.x < 714 and frame.y >= 133 and frame.y < 417)) then
+								destination.bmzBattleSlot = slot
+							end
+						end
+					end
 					if parts.bmzDetailOptions == 1 then
 						skin.bmzDetailOptions = 1
 						skin.bmzDetailOptionsNumbers = parts.bmzDetailOptionsNumbers == true
@@ -178,6 +193,21 @@ function load_parts()
 			end
 		end
 		skin.destination = destinations
+	end
+	-- Keep the original callbacks running: some update values used by other destinations.
+	-- If the optional part fails or is disabled, leave both legacy panels untouched.
+	if skin.bmzBattleInfo then
+		for _, destination in ipairs(skin.destination) do
+			if destination.bmzBattleSlot then
+				local original, replace_for_dp = destination.draw, destination.bmzBattleSlot == "dp"
+				destination.draw = function()
+					local original_visible = not original or original()
+					local mode = main_state.number(20208)
+					local double = mode == 10 or mode == 14
+					return original_visible and (not main_state.option(20200) or double ~= replace_for_dp)
+				end
+			end
+		end
 	end
 	return skin
 end
