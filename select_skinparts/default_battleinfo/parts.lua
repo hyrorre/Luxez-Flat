@@ -12,6 +12,8 @@ local function load()
 			{id = prefix .. "options", path = "select_skinparts/default_stateplayoption/stateoption_resize.png"},
 			{id = prefix .. "options_bmz", path = "select_skinparts/default_stateplayoption/random_bmz.png"},
 		},
+		-- The bundled Noto Sans CJK Medium is closest to the key tiles' bold digits.
+		font = {{id = prefix .. "digits", path = "select_skinparts/default_detailoptions/font/NotoSansCJKjp-Medium.otf"}},
 		image = {}, imageset = {}, text = {}, destination = {},
 	}
 	local function is_double()
@@ -25,10 +27,11 @@ local function load()
 	local function sprite(id, source, x, y, w, h)
 		table.insert(parts.image, {id = prefix .. id, src = prefix .. source, x = x, y = y, w = w, h = h})
 	end
-	local function destination(id, x, top, w, h, double, op, draw, muted)
+	local function destination(id, x, top, w, h, double, op, draw, muted, color)
 		local frame = {x = x, y = 1080 - top - h, w = w, h = h}
 		-- The native NO PLAY face is RGB(127, 128, 128).
-		if muted then frame.r, frame.g, frame.b = 127, 128, 128 end
+		if muted then color = {127, 128, 128} end
+		if color then frame.r, frame.g, frame.b = color[1], color[2], color[3] end
 		table.insert(parts.destination, {id = prefix .. id, op = op or {active}, draw = function()
 			return is_double() == double and (not draw or draw())
 		end, dst = {frame}})
@@ -38,11 +41,14 @@ local function load()
 		local size = options.size or 18
 		local definition = {id = prefix .. id, font = options.font or "font_sub_small",
 			size = size, overflow = 1, align = options.align or 0}
+		if options.outline then
+			definition.outlineColor, definition.outlineWidth = "000000FF", options.outline
+		end
 		if type(value) == "number" then definition.ref = value
 		elseif type(value) == "function" then definition.value = value
 		else definition.constantText = value end
 		table.insert(parts.text, definition)
-		destination(id, x, top, w, size, double, options.op, options.draw, options.muted)
+		destination(id, x, top, w, size, double, options.op, options.draw, options.muted, options.color)
 	end
 	local arrangements = {"NORMAL", "MIRROR", "RANDOM", "R-RANDOM", "S-RANDOM", "SPIRAL",
 		"H-RANDOM", "ALL-SCR", "RANDOM-EX", "S-RANDOM-EX", "F-RANDOM", "MF-RANDOM"}
@@ -54,10 +60,19 @@ local function load()
 			index <= 10 and (index - 1) * 25 or (index - 11) * 21, widths[index], 21)
 	end
 	for number = 1, 7 do sprite("key_" .. number, "keys", (number - 1) * 25, 0, 25, 35) end
-	-- Unnumbered gutters of the same result artwork frame 8/9 and scratch S.
-	sprite("key_left", "keys", 0, 0, 3, 35)
-	sprite("key_fill", "keys", 3, 0, 1, 35)
-	sprite("key_right", "keys", 22, 0, 3, 35)
+	-- 8, 9 and S: the frame and plain face of tile 1 (odd, light) or tile 2 (even, dark),
+	-- picked by the original lane as the numbered tiles are.
+	local blanks = {{"key_left", 0, 5}, {"key_fill", 5, 1}, {"key_right", 19, 6}}
+	local blank_images = {}
+	for _, blank in ipairs(blanks) do
+		for shade = 1, 2 do
+			sprite(blank[1] .. "_" .. shade, "keys", (shade - 1) * 25 + blank[2], 0, blank[3], 35)
+		end
+		blank_images[blank[1]] = {}
+		for value = 0, 9 do
+			table.insert(blank_images[blank[1]], prefix .. blank[1] .. "_" .. (value % 2 == 1 and 1 or 2))
+		end
+	end
 	for _, double in ipairs({false, true}) do
 		local layout = double and "dp_" or "sp_"
 		local source, x, top, w, h = double and "detail" or "rival",
@@ -142,12 +157,18 @@ local function load()
 							return visible() and main_state.number(number_ref) <= 7 and token() ~= "S"
 						end)
 						local function fallback() return visible() and (main_state.number(number_ref) > 7 or token() == "S") end
-						for _, strip in ipairs({{"key_left", 0, 3}, {"key_fill", 3, 19}, {"key_right", 22, 3}}) do
-							destination(strip[1], left + strip[2], key_top, strip[3], 35, double,
+						local fill_left, fill_right = blanks[2][2], blanks[3][2]
+						for _, blank in ipairs({{blanks[1][1], 0, blanks[1][3]},
+							{blanks[2][1], fill_left, fill_right - fill_left}, {blanks[3][1], fill_right, blanks[3][3]}}) do
+							table.insert(parts.imageset, {id = prefix .. id .. "_" .. blank[1], value = number_ref,
+								images = blank_images[blank[1]]})
+							destination(id .. "_" .. blank[1], left + blank[2], key_top, blank[3], 35, double,
 								{active, pattern, -loading}, fallback)
 						end
-						text(id .. "_fallback", token, left + 12, key_top + 5, 24, double,
-							{font = "font_sub", size = 24, align = 1, op = {active, pattern, -loading}, draw = fallback})
+						-- The tiles' digits: RGB(255, 168, 0) with a black edge.
+						text(id .. "_fallback", token, left + 12, key_top + 1, 24, double,
+							{font = prefix .. "digits", size = 27, align = 1, outline = 1, color = {255, 168, 0},
+								op = {active, pattern, -loading}, draw = fallback})
 					end
 				end
 			end
