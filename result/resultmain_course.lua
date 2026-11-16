@@ -1758,7 +1758,7 @@ local function main()
 			table.insert(ir.slider, {id = "ir_scroll_cursor",	src = "ir_scroll_cursor", x = 0, y = 0, w = 64, h = 64, angle = 2, range = 460, type = 8, changeable = false})
 			table.insert(ir.slider, {id = "ir_scroll_collision",	src = "ir_scroll_cursor", x = 0, y = 64, w = 64, h = 64, angle = 2, range = 460, type = 8, changeable = true})
 			table.insert(ir.destination,  {id = "ir_scroll_cursor", draw = function() return result_mode == 1 end, loop = 0, blend = 2, dst = {{time = 0, x = ir.pos.scroll_x - result_r, y = ir.pos.y + ir.pos.scroll_offset_y, w = 64, h = 64, a = 255},{time = 350, a = 180},{time = 400, a = 255}}})
-			table.insert(ir.destination,  {id = "ir_scroll_collision",	draw = function() return result_mode == 1 end, dst = {{x = ir.pos.scroll_x - result_r, y = ir.pos.y + ir.pos.scroll_offset_y, w = 64, h = 64}}})
+			table.insert(ir.destination,  {id = "ir_scroll_collision",	draw = function() return result_mode == 1 end, dst = {{x = ir.pos.scroll_x - result_r, y = ir.pos.y + ir.pos.scroll_offset_y + 32, w = 64, h = 64}}})
 
 			for i = 1, 10 do
 				
