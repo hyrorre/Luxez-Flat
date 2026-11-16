@@ -17,7 +17,7 @@ local function load()
 	parts.destination = {
 		{id = "song_scroll_frame", dst = {{x = parts_position.x, y = parts_position.y, w = 52, h = 714}}},
 		{id = "song_scroll_cursor", loop = 0, blend = 2, dst = {{time = 0, x = parts_position.x - 5, y = parts_position.y + 560, w = 64, h = 64, a = 255},{time = 350, a = 180},{time = 400, a = 255}}},
-		{id = "default_songlistscroll2_collision", dst = {{time = 0, x = parts_position.x - 5, y = parts_position.y + 560, w = 64, h = 64}}},
+		{id = "default_songlistscroll2_collision", dst = {{time = 0, x = parts_position.x - 5, y = parts_position.y + 560 + 32, w = 64, h = 64}}},
 	}
 	
 	return parts
